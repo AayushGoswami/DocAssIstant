@@ -7,7 +7,7 @@ chmod +x download_dll.sh
 ./download_dll.sh
 
 # Install tesseract_ocr
-apt-get update && apt-get install -y tesseract-ocr
+sudo apt-get update && sudo apt-get install -y tesseract-ocr
 
 # Continue with Python dependencies
 pip install -r requirements.txt
