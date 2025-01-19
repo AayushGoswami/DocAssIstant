@@ -3,14 +3,12 @@ from PIL import Image
 import cv2
 import numpy as np
 import logging
+import os
 
-# from utils.ocr_path import path
-# paths = path()
-# print(paths)
-# pytesseract.pytesseract.tesseract_cmd = paths
 
-pytss_path = r"c:\Users\silve\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
-pytesseract.pytesseract.tesseract_cmd = pytss_path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OCR_DIR = os.path.join(BASE_DIR, "OCR", "Tesseract-OCR", "tesseract.exe")
+pytesseract.pytesseract.tesseract_cmd = OCR_DIR
 
 
 def preprocess_image(image_path):
