@@ -5,8 +5,6 @@ import numpy as np
 import logging
 import os
 
-# Remove the Windows-specific path configuration
-# pytesseract will use the system installation on Linux
 def preprocess_image(image_path):
     """
     Preprocess the image to improve OCR accuracy.
