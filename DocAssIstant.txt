@@ -1,0 +1,29 @@
+DocAssIstant
+├── .env
+├── DocAssIstant.txt
+├── README.md
+├── app.py
+├── requirements.txt
+├── static
+│   ├── script.js
+│   ├── styles.css
+│   └── uploads
+├── templates
+│   ├── 404.html
+│   ├── about.html
+│   ├── blood_report_analyzer.html
+│   ├── components
+│   │   └── sidebar.html
+│   ├── ecg_analyzer.html
+│   ├── home.html
+│   └── x_ray_analyzer.html
+└── utils
+    ├── __init__.py
+    ├── __pycache__
+    ├── ai_processor.py
+    ├── image_extractor.py
+    ├── models
+    │   ├── chest_xray_model_quantized.tflite
+    │   └── ecg_model_quantized.tflite
+    ├── ocr_path.py
+    └── pdf_extractor.py
