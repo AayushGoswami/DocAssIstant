@@ -1,6 +1,15 @@
+
 services:
   - type: web
     name: docassistant
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: bash build.sh
     startCommand: gunicorn app:app
+
+
+# services:
+#   - type: web
+#     name: docassistant
+#     env: python
+#     buildCommand: pip install -r requirements.txt
+#     startCommand: gunicorn app:app
