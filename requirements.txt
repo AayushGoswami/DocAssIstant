@@ -6,3 +6,7 @@ pytesseract
 PyPDF2
 python-dotenv
 groq
+tensorflow
+typing-extensions
+python-logging-handler
+gunicorn
