@@ -23,15 +23,35 @@ class AIProcessor:
         # Initialize the Groq client
         self.client = Groq(api_key=api_key)
 
-                # Initialize TFLite model for X-ray analysis
-        self.xray_interpreter = tf.lite.Interpreter(model_path='utils/models/chest_xray_model_quantized.tflite')
+        #Get the base directory of the deployment
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        # Initialize TFLite model for X-ray analysis
+        XRAY_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'chest_xray_model_quantized.tflite')
+        self.xray_interpreter = tf.lite.Interpreter(model_path=XRAY_MODEL_PATH)
         self.xray_interpreter.allocate_tensors()
-        
+
         # Get input and output details for X-ray model
         self.xray_input_details = self.xray_interpreter.get_input_details()
         self.xray_output_details = self.xray_interpreter.get_output_details()
 
-    
+
+        # Initialize TFLite model for ECG analysis
+        ECG_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'ecg_model_quantized.tflite')
+        self.ecg_interpreter = tf.lite.Interpreter(model_path=ECG_MODEL_PATH)
+        self.ecg_interpreter.allocate_tensors()
+
+        # Get input and output details for ECG model
+        self.input_details = self.ecg_interpreter.get_input_details()
+        self.output_details = self.ecg_interpreter.get_output_details()
+
+        self.class_labels = [
+            "ECG of Myocardial Infarction Patient",
+            "ECG of Patient with Abnormal Heartbeat",
+            "ECG of Patient with History of Myocardial Infarction",
+            "Normal ECG"
+        ]
+
 
 
     ### MEDICAL REPORT ANALYZER PROCESSES ###
@@ -220,7 +240,7 @@ class AIProcessor:
     def analyze_x_ray_image(self, img_path: str) -> str:
 
         try:
-            # Preprocess the image
+            # Preprocess the X-Ray image
             img_array = self.preprocess_image(img_path)
 
             # Set the input tensor
@@ -231,12 +251,7 @@ class AIProcessor:
 
             # Get the prediction results
             prediction = self.xray_interpreter.get_tensor(self.xray_output_details[0]['index'])
-            # prediction = self.xray_interpreter.get_tensor(self.xray_output_details[0]['index'])
             print(prediction)  # Keep your debug print
-            
-            # Make a prediction
-            # prediction = self.xray_model.predict(img_array)
-            # print(prediction)
             
             # Get the class label
             if prediction[0] < 0.5:
@@ -286,44 +301,32 @@ class AIProcessor:
 ### ECG IMAGE ANALYZER PROCESSES ###
 
 
-    # Load TFLite model
-    ecg_interpreter = tf.lite.Interpreter(model_path='utils/models/ecg_model_quantized.tflite')
-    ecg_interpreter.allocate_tensors()
-    
-    # Get input and output tensors
-    input_details = ecg_interpreter.get_input_details()
-    output_details = ecg_interpreter.get_output_details()
-    
-    class_labels = [
-        "ECG of Myocardial Infarction Patient",
-        "ECG of Patient with Abnormal Heartbeat",
-        "ECG of Patient with History of Myocardial Infarction",
-        "Normal ECG"
-    ]
 
+    def classify_ecg(self, img_path: str) -> str:
 
-    def classify_ecg(self, img_path):
-        """
-        Classify the input ECG image.
-        Args:
-            img_path (str): Path to the ECG image.
-        Returns:
-            str: Predicted class label.
-        """
-        img_array = self.preprocess_image(img_path)
+        try:
+            # Preprocess the ECG Graph image
+            img_array = self.preprocess_image(img_path)
+
             # Set input tensor
-        self.ecg_interpreter.set_tensor(self.input_details[0]['index'], img_array)
+            self.ecg_interpreter.set_tensor(self.input_details[0]['index'], img_array)
+            
+            # Run inference
+            self.ecg_interpreter.invoke()
+            
+            # Get prediction results
+            predictions = self.ecg_interpreter.get_tensor(self.output_details[0]['index'])
+            
+            # Get predicted class
+            predicted_class = np.argmax(predictions, axis=1)[0]
+            print(predictions)  # Keep your debug print
+
+            # Return the predicted class label
+            return self.class_labels[predicted_class]
         
-        # Run inference
-        self.ecg_interpreter.invoke()
-        
-        # Get prediction results
-        predictions = self.ecg_interpreter.get_tensor(self.output_details[0]['index'])
-        
-        # Get predicted class
-        predicted_class = np.argmax(predictions, axis=1)[0]
-        print(predictions)  # Keep your debug print
-        return self.class_labels[predicted_class]
+        except Exception as e:
+            logging.error(f"Error in AI analysis: {e}")
+            return f"Error in AI analysis: {str(e)}"
 
 
     def summarize_ecg(self, text: str) -> str:
