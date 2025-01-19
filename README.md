@@ -16,4 +16,4 @@
 
 ## __You are ready to run the project 😊__
 
-GitHub Repository link - [__Click Here__](https://github.com/AayushGoswami/F_AI_L2)
+GitHub Repository link - [__Click Here__](https://github.com/AayushGoswami/DocAssIstant)
