@@ -128,5 +128,10 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    
+    #For local Deployment, uncomment the below line of code
+    # app.run(debug=True)
+    
+    #For Web Deployment, uncomment the below line of code
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
