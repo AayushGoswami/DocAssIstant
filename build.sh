@@ -13,5 +13,5 @@ export PATH="/usr/bin/tesseract:$PATH"
 ln -s /usr/bin/tesseract /usr/local/bin/tesseract
 
 # Verify installation
-tesseract --version
+which tesseract && tesseract --version
 python3 -c "import pytesseract; print(pytesseract.get_tesseract_version())"
