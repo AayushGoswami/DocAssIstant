@@ -11,7 +11,8 @@ dotenv.load_dotenv()
 app = Flask(__name__)
 
 # Ensure upload directory exists
-UPLOAD_FOLDER = "static/uploads"
+# UPLOAD_FOLDER = "static/uploads"
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
