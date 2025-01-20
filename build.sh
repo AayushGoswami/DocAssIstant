@@ -1,34 +1,16 @@
-#!/usr/bin/env bash
-
-# Make the download script executable
-# chmod +x download_dll.sh
-
-# # Execute the download script
-# ./download_dll.sh
-
-# Install tesseract_ocr
-sudo apt-get update
+#!/bin/bash
 
 # Install tesseract-ocr and its dependencies
-sudo apt-get install -y \
-    tesseract-ocr \
-    libtesseract-dev \
-    libleptonica-dev \
-    pkg-config \
-    python3-pip
-
+sudo apt-get update && sudo apt-get install -y tesseract-ocr && sudo apt-get install -y libtesseract-dev && sudo apt-get install -y libleptonica-dev && sudo apt-get install -y pkg-config
 
 # Continue with Python dependencies
 pip install -r requirements.txt
 
 # Add Tesseract to PATH
-echo 'export PATH="/usr/bin/tesseract:$PATH"' >> ~/.bashrc
+export PATH="/usr/bin/tesseract:$PATH"
 
 # Create symlink to ensure tesseract is accessible
 ln -s /usr/bin/tesseract /usr/local/bin/tesseract
-
-# Reload bash profile to apply PATH changes
-source ~/.bashrc
 
 # Verify installation
 tesseract --version
