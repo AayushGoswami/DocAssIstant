@@ -1,18 +1,11 @@
 #!/usr/bin/env bash
+# Exit on error
+set -e
 
-# Make the download script executable
-chmod +x download_dll.sh
+# Install system dependencies
+apt-get update -y
+apt-get install -y tesseract-ocr
+apt-get install -y libtesseract-dev
 
-# Execute the download script
-./download_dll.sh
-
-# Install tesseract_ocr
-sudo apt-get update && sudo apt-get install -y tesseract-ocr
-
-# Continue with Python dependencies
+# Install Python dependencies
 pip install -r requirements.txt
-
-# Add Tesseract to PATH
-export PATH="/usr/bin/tesseract:$PATH"
-
-which tesseract && tesseract --version
