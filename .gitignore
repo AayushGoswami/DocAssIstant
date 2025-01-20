@@ -1,6 +1,5 @@
 .env
 __pycache__/
 *.pyc
-.DS_Store
-utils/OCR/Tesseract-OCR/
-*.dll
+static/uploads/*
+!static/uploads/.gitkeep
