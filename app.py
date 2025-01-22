@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 import dotenv
 from utils.pdf_extractor import extract_text_from_pdf, validate_pdf
-from utils.image_extractor import extract_text_from_image, supported_image_formats
 from utils.ai_processor import AIProcessor
 
 # Load environment variables
@@ -11,8 +10,7 @@ dotenv.load_dotenv()
 app = Flask(__name__)
 
 # Ensure upload directory exists
-# UPLOAD_FOLDER = "static/uploads"
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/uploads')
+UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
@@ -44,22 +42,23 @@ def blood_report_analyzer():
                     else:
                         summary = "Invalid PDF file. Please upload a valid PDF."
                         return render_template("blood_report_analyzer.html", summary=summary)
+                    
+                    # Validate if the document seems to be medical
+                    if ai_processor.validate_medical_document(extracted_text):
+                        # Summarize the report
+                        summary = ai_processor.summarize_medical_document_pdf(extracted_text)
+                    else:
+                        summary = "The uploaded document does not appear to be a medical report."
+
                 
-                elif file_ext in supported_image_formats():
+                elif file_ext in ai_processor.supported_image_formats():
                     # Extract text from image
-                    extracted_text = extract_text_from_image(file_path)
+                    summary = ai_processor.summarize_medical_document_image(file_path)
                 
                 else:
                     summary = f"Unsupported file type: {file_ext}. Please upload a PDF or image."
                     return render_template("blood_report_analyzer.html", summary=summary)
-                
-                # Validate if the document seems to be medical
-                if ai_processor.validate_medical_document(extracted_text):
-                    # Summarize the report
-                    summary = ai_processor.summarize_medical_document(extracted_text)
-                else:
-                    summary = "The uploaded document does not appear to be a medical report."
-            
+                            
             except Exception as e:
                 summary = f"Error processing document: {str(e)}"
             
@@ -129,10 +128,6 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    
-    #For local Deployment, uncomment the below line of code
-    # app.run(debug=True)
-    
-    #For Web Deployment, uncomment the below line of code
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(debug=True)
+
 
