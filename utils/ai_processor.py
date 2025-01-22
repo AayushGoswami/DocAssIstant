@@ -2,11 +2,13 @@ import os
 import logging
 from typing import Optional, List
 from dotenv import load_dotenv
-from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import tensorflow as tf
 import numpy as np
 from groq import Groq
+import base64
+
+
 
 # Load environment variables
 load_dotenv()
@@ -57,8 +59,9 @@ class AIProcessor:
     ### MEDICAL REPORT ANALYZER PROCESSES ###
 
 
+    ## FROM PDF ##
 
-    def summarize_medical_document(
+    def summarize_medical_document_pdf(
         self, 
         text: str,
     ) -> str:
@@ -69,9 +72,10 @@ class AIProcessor:
                 return "Insufficient text for meaningful analysis."
             
             # Construct prompt
-            prompt = f"""Analyze and summarize the following medical document.
+            prompt = f"""You are an experienced medical practitioner and radiologist.
+            Analyze and summarize the following medical document.
             Maintain a professional tone and focus on key medical insights. 
-            Provide a clear, concise summary highlighting key medical insights, 
+            Provide a compact summary highlighting only the key medical insights, 
             important parameters, and any potential areas of concern:
 
             {text}
@@ -93,7 +97,6 @@ class AIProcessor:
                 max_tokens=1024,
                 temperature=0.7,
             )
-            # print(chat_completions.choices[0].message.content.strip())
             # Extract and return the summary text
             return chat_completions.choices[0].message.content.strip()
         
@@ -187,7 +190,6 @@ class AIProcessor:
                 ],
                 max_tokens=300
             )
-            # print(response.choices[0].message.content.strip())
             # Extract and return the parameter analysis
             return response.choices[0].message.content.strip()
         
@@ -219,6 +221,58 @@ class AIProcessor:
         
         return keyword_count >= 3
 
+    ## FROM IMAGE ##
+
+    def supported_image_formats(self):
+        """
+        List of supported image formats for OCR.
+        
+        Returns:
+            list: Supported image file extensions
+        """
+        return ['.png', '.jpg', '.jpeg', '.tiff', '.bmp']
+
+
+    # Function to encode the image
+    def summarize_medical_document_image(self, image_path):
+        with open(image_path, "rb") as image_file:
+            base64_image= base64.b64encode(image_file.read()).decode('utf-8')
+            try:
+
+                # Construct prompt
+                prompt = f"""You are an experienced medical practitioner and radiologist.
+                Analyze and summarize the following medical document.
+                Maintain a professional tone and focus on key medical insights. 
+                Provide a compact summary highlighting only key medical insights, 
+                important parameters, and any potential areas of concern:
+                    """
+
+
+                chat_completions = self.client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": prompt},
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/jpeg;base64,{base64_image}",
+                                    },
+                                },
+                            ],
+                        }
+                    ],
+                    model="llama-3.2-11b-vision-preview",
+                    max_tokens=1024,
+                    temperature=0.7,
+                )
+                # Extract and return the summary text
+                return chat_completions.choices[0].message.content.strip()
+            
+            except Exception as e:
+                logging.error(f"Error in AI summarization: {e}")
+                return f"Error in AI analysis: {str(e)}"
 
 
 ### COMMON IMAGE PREPROCESSOR FUNCTION ###
@@ -252,10 +306,10 @@ class AIProcessor:
             # Get the prediction results
             prediction = self.xray_interpreter.get_tensor(self.xray_output_details[0]['index'])
             print(prediction)  # Keep your debug print
-            
+                        
             # Get the class label
             if prediction[0] < 0.5:
-                return "The X-ray image appears to be Normal."
+                return "The X-ray image appears to be Normal without any signs of Pneumonia."
             else:
                 return "The X-ray image shows signs of Pneumonia."
         
@@ -268,7 +322,8 @@ class AIProcessor:
 
         try:
             # Construct prompt
-            prompt = f"""Analyze and summarize the following X-Ray report in breif in a Professional tone.
+            prompt = f"""You are an experienced radiologist and a Speacialist in Pulmonary diseases.
+            Analyze and summarize the following X-Ray report in breif in a Professional tone.
             
             {text}
                     """
@@ -340,7 +395,8 @@ class AIProcessor:
 
         try:
             # Construct prompt
-            prompt = f"""Analyze and summarize the following ECG Graph Report in brief in a Profesional tone.
+            prompt = f"""You are an well experienced radiologist and cardiology practitioner.
+            Analyze and summarize the following ECG Graph Report in brief in a Profesional tone.
             
             {text}
                     """
@@ -367,3 +423,5 @@ class AIProcessor:
         except Exception as e:
             logging.error(f"Error in AI summarization: {e}")
             return f"Error in AI analysis: {str(e)}"
+
+
