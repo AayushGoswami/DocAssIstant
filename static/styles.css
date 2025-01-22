@@ -198,6 +198,12 @@ h1 {
     text-align: center;
     margin-bottom: 10px;
 }
+.file-label p {
+    font-size: 1em;
+    color: #22306d;
+    text-align: center;
+    margin-bottom: 10px;
+}
 
 .file-input {
     padding: 15px;
