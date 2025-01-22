@@ -12,8 +12,10 @@
     <div class="main-content">
         <h1>X-ray Analyzer</h1>
         <form action="{{ url_for('x_ray_analyzer') }}" method="post" enctype="multipart/form-data" class="upload-form">
-            <label for="file-upload" class="file-label"><h2>Upload X Ray Image:</h2></label>
-            <!-- <p>By uploading the X-Ray of patient's chest i can help you to know if patient is having pnumonia or not !!</p> -->
+            <label for="file-upload" class="file-label"><h2>Upload X-Ray(Chest) Image:</h2>
+            <p>In this <strong>prototype</strong> release, the model is currently capable of identifying if a provided <strong>Chest X-Ray Image</strong> is of a <strong>Healthy Patient</strong> or of a patient with signs of <strong>Pneumonia.</strong></p>
+            <p>Future releases will contain further upgradations and advancements.</p>
+            </label>
             <input type="file" id="file-upload" name="file" accept=".jpg, .jpeg, .png" class="file-input" multiple>
             <button type="submit" class="upload-btn">Analyze</button>
         </form>
@@ -21,9 +23,6 @@
         <div class="sub-content">
             <h2>Analysis Summary:</h2>
             <p id="markdown-content">{{ summary }}</p>
-        <!-- <p>
-            Welcome to the <b>X-ray Analyzer!</b> This feature is under development.
-        </p> -->
         </div>
         {% endif %}
     </div>
