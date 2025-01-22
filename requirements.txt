@@ -1,12 +1,8 @@
 Flask
-Pillow
-opencv-python-headless
 numpy
-pytesseract
 PyPDF2
 python-dotenv
 groq
 tensorflow
 tensorflow-lite
-typing-extensions
 gunicorn
