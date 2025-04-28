@@ -81,7 +81,7 @@ An AI-powered platform to assist healthcare professionals by providing quick and
 ---
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the Apache 2.0 License.
 
 ---
 
