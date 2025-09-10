@@ -3,7 +3,7 @@ name: Keep Render App Awake
 on:
   schedule:
     # Runs every 10 minutes
-    - cron: '*/10 * * * *'
+    - cron: '*/12 * * * *'
   workflow_dispatch:
 
 jobs:
