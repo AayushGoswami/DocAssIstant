@@ -2,7 +2,7 @@ name: Keep Render App Awake
 
 on:
   schedule:
-    # Runs every 10 minutes
+    # Runs every 12 minutes
     - cron: '*/12 * * * *'
   workflow_dispatch:
 
@@ -10,5 +10,28 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Ping Render App
         run: curl -sSf "${{ secrets.RENDER_APP_URL }}"
+        
+      - name: Update last run timestamp
+        run: |
+          mkdir -p .github
+          echo "Last run: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > .github/last_run.txt
+          
+      - name: Commit timestamp update
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .github/last_run.txt
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: update keep-awake timestamp [skip ci]"
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
