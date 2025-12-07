@@ -24,15 +24,20 @@ jobs:
           echo "Last run: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > .github/last_run.txt
           
       - name: Commit timestamp update
+        id: commit
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .github/last_run.txt
           if ! git diff --staged --quiet; then
             git commit -m "chore: update keep-awake timestamp [skip ci]"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
           fi
           
       - name: Push changes
+        if: steps.commit.outputs.changes == 'true'
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
