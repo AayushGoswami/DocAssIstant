@@ -28,10 +28,12 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .github/last_run.txt
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: update keep-awake timestamp [skip ci]"
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update keep-awake timestamp [skip ci]"
+          fi
           
       - name: Push changes
-        uses: ad-m/github-push-action@master
+        uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
